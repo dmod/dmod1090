@@ -13,7 +13,7 @@
 
     <script type="text/javascript">
         $(document).ready(function () {
-            $('#example').DataTable({
+            var table = $('#traffic_table').DataTable({
                 "ajax": {
                     "url": "/api/v1/current_traffic",
                     "dataSrc": ""
@@ -36,7 +36,14 @@
                 ],
                 "paging": false
             });
+
+            setInterval(function () {
+                table.ajax.reload(null, false);
+            }, 2000);
+
         });
+
+
     </script>
 
     <meta charset="UTF-8" />
@@ -50,7 +57,7 @@
     </div>
 
     <div style="text-align:center;padding:20px;">
-        <table id="example" class="display" cellspacing="0" width="100%">
+        <table id="traffic_table" class="display" cellspacing="0" width="100%">
             <thead>
                 <tr>
                     <th>hex</th>
