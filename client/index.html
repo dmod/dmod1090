@@ -46,7 +46,14 @@
 
     </script>
 
-    <meta charset="UTF-8" />
+    <meta name="viewport" content="initial-scale=1.0">
+    <meta charset="utf-8">
+    <style>
+        #map {
+            height: 90%;
+            width: 100%;
+        }
+    </style>
     <title></title>
 </head>
 
@@ -55,6 +62,18 @@
     <div style="text-align:center;padding:40px;">
         <h1><span style="padding:20px;"></span>Current Traffic<span style="padding:20px;"></span></h1>
     </div>
+
+    <div id="map"></div>
+    <script>
+        var map;
+        function initMap() {
+            //38.9465, -76.7256
+            var randomLocation = {lat: 38.9465, lng: -76.7256};
+            let map = new google.maps.Map(document.getElementById('map'), { center: { lat: 39.174, lng: -76.67 }, zoom: 10 });
+            var marker = new google.maps.Marker({position: randomLocation, map: map});
+        }
+    </script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCiGYPCr8an-KXJArTgK5YC_Zm45TmhQJ8&callback=initMap" async defer></script>
 
     <div style="text-align:center;padding:20px;">
         <table id="traffic_table" class="display" cellspacing="0" width="100%">
