@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <script type="text/javascript" src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/1.10.16/js/dataTables.semanticui.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.13/semantic.min.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.13/semantic.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.16/css/dataTables.semanticui.min.css" />
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('#example').DataTable({
+                "ajax": {
+                    url: 'sample_traffic.json'
+                },
+                "paging": false
+            });
+        });
+    </script>
+
+    <meta charset="UTF-8" />
+    <title></title>
+</head>
+
+<body>
+
+    <div style="text-align:center;padding:40px;">
+        <h1><span style="padding:20px;"></span>Current Traffic<span style="padding:20px;"></span></h1>
+    </div>
+
+    <div style="text-align:center;padding:20px;">
+        <table id="example" class="display" cellspacing="0" width="100%">
+            <thead>
+                <tr>
+                    <th>hex</th>
+                    <th>squawk</th>
+                    <th>flight</th>
+                    <th>lat</th>
+                    <th>lon</th>
+                    <th>validposition</th>
+                    <th>altitude</th>
+                    <th>vert_rate</th>
+                    <th>track</th>
+                    <th>validtrack</th>
+                    <th>speed</th>
+                    <th>messages</th>
+                    <th>seen</th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+</body>
+
+</html>
