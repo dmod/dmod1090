@@ -15,9 +15,24 @@
         $(document).ready(function () {
             $('#example').DataTable({
                 "ajax": {
-                    "url": "http://71.244.212.145:8080/dump1090/data.json",
-                    "crossDomain": true
+                    "url": "/api/v1/current_traffic",
+                    "dataSrc": ""
                 },
+                "columns": [
+                    { "data": "hex" },
+                    { "data": "squawk" },
+                    { "data": "flight" },
+                    { "data": "lat" },
+                    { "data": "lon" },
+                    { "data": "validposition" },
+                    { "data": "altitude" },
+                    { "data": "vert_rate" },
+                    { "data": "track" },
+                    { "data": "validtrack" },
+                    { "data": "speed" },
+                    { "data": "messages" },
+                    { "data": "seen" }
+                ],
                 "paging": false
             });
         });
