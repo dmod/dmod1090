@@ -1,0 +1,15 @@
+{
+  "name": "dmod1090",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "start": "node server",
+    "heroku-postbuild": "cd client/ && npm install && npm install --only=dev --no-shrinkwrap && npm run build",
+    "debug": "node --nolazy --inspect-brk=9229 server"
+  },
+  "dependencies": {
+    "express": "^4.15.2"
+  },
+  "devDependencies": {},
+  "license": "MIT"
+}

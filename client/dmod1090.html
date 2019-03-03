@@ -15,7 +15,8 @@
         $(document).ready(function () {
             $('#example').DataTable({
                 "ajax": {
-                    url: 'sample_traffic.json'
+                    "url": "http://71.244.212.145:8080/dump1090/data.json",
+                    "crossDomain": true
                 },
                 "paging": false
             });
