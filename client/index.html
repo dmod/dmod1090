@@ -7,6 +7,8 @@
     <script type="text/javascript" src="https://cdn.datatables.net/1.10.16/js/dataTables.semanticui.min.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.13/semantic.min.js"></script>
 
+    <script type="text/javascript" src="maps_style.js"></script>
+
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.13/semantic.min.css" />
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css" />
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.16/css/dataTables.semanticui.min.css" />
@@ -67,10 +69,11 @@
     <script>
         var map;
         function initMap() {
-            //38.9465, -76.7256
-            var randomLocation = {lat: 38.9465, lng: -76.7256};
-            let map = new google.maps.Map(document.getElementById('map'), { center: { lat: 39.174, lng: -76.67 }, zoom: 10 });
-            var marker = new google.maps.Marker({position: randomLocation, map: map});
+            let map = new google.maps.Map(document.getElementById('map'), { center: { lat: 39.174, lng: -76.67 }, zoom: 10, styles: mapStyle });
+            new google.maps.Marker({ position: { lat: 38.9465, lng: -76.7256 }, map: map });
+            new google.maps.Marker({ position: { lat: 38.165, lng: -76.7256 }, map: map });
+            new google.maps.Marker({ position: { lat: 38.9465, lng: -76.556 }, map: map });
+            new google.maps.Marker({ position: { lat: 37.9465, lng: -76.8256 }, map: map });
         }
     </script>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCiGYPCr8an-KXJArTgK5YC_Zm45TmhQJ8&callback=initMap" async defer></script>
