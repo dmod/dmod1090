@@ -68,7 +68,7 @@
     <div id="map"></div>
     <script>
         var map;
-        var markers = {};
+        var traffic_state = {};
         function initMap() {
             map = new google.maps.Map(document.getElementById('map'), {
                 center: { lat: 39.174, lng: -76.67 }, gestureHandling: 'greedy'
@@ -80,16 +80,25 @@
             $.getJSON("/api/v1/current_traffic", function (data) {
                 $.each(data, function (key, val) {
                     if (val.validposition) {
-                        if (markers[val.hex]) {
+                        if (traffic_state[val.hex]) {
                             var newLatLng = new google.maps.LatLng(val.lat, val.lon);
-                            markers[val.hex].setPosition(newLatLng);
+                            traffic_state[val.hex].marker.setPosition(newLatLng);
+                            var path = traffic_state[val.hex].polyline.getPath();
+                            path.push(newLatLng);
                         } else {
                             var infowindow = new google.maps.InfoWindow({ content: val.hex + " " + val.flight });
                             var marker = new google.maps.Marker({ position: { lat: val.lat, lng: val.lon }, map: map, title: val.hex });
                             marker.addListener('click', function () {
                                 infowindow.open(map, marker);
                             });
-                            markers[val.hex] = marker;
+                            var poly = new google.maps.Polyline({
+                                strokeColor: '#FF0000',
+                                strokeOpacity: 1.0,
+                                strokeWeight: 3
+                            });
+                            poly.setMap(map);
+
+                            traffic_state[val.hex] = { marker: marker, polyline: poly };
                         }
                     }
                 });
