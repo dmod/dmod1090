@@ -41,7 +41,7 @@
 
             setInterval(function () {
                 table.ajax.reload(null, false);
-            }, 2000);
+            }, 1000);
 
         });
 
@@ -68,23 +68,33 @@
     <div id="map"></div>
     <script>
         var map;
+        var markers = {};
         function initMap() {
-            let map = new google.maps.Map(document.getElementById('map'), { center: { lat: 39.174, lng: -76.67 }, zoom: 10, styles: mapStyle });
+            map = new google.maps.Map(document.getElementById('map'), { center: { lat: 39.174, lng: -76.67 }, zoom: 10, styles: mapStyle });
+        }
+
+        function setData() {
             $.getJSON("/api/v1/current_traffic", function (data) {
-                var items = [];
                 $.each(data, function (key, val) {
                     if (val.validposition) {
-                        var infowindow = new google.maps.InfoWindow({
-                            content: val.hex + " " + val.flight
-                        });
-                        var marker = new google.maps.Marker({ position: { lat: val.lat, lng: val.lon }, map: map, title: val.hex });
-                        marker.addListener('click', function () {
-                            infowindow.open(map, marker);
-                        });
+                        if (markers[val.hex]) {
+                            var newLatLng = new google.maps.LatLng(val.lat, val.lon);
+                            markers[val.hex].setPosition(newLatLng);
+                        } else {
+                            var infowindow = new google.maps.InfoWindow({ content: val.hex + " " + val.flight });
+                            var marker = new google.maps.Marker({ position: { lat: val.lat, lng: val.lon }, map: map, title: val.hex });
+                            marker.addListener('click', function () {
+                                infowindow.open(map, marker);
+                            });
+                            markers[val.hex] = marker;
+                        }
                     }
                 });
             });
         }
+        setData();
+        setInterval(setData, 1000);
+
     </script>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCiGYPCr8an-KXJArTgK5YC_Zm45TmhQJ8&callback=initMap" async defer></script>
 
