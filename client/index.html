@@ -70,7 +70,10 @@
         var map;
         var markers = {};
         function initMap() {
-            map = new google.maps.Map(document.getElementById('map'), { center: { lat: 39.174, lng: -76.67 }, zoom: 10, styles: mapStyle });
+            map = new google.maps.Map(document.getElementById('map'), {
+                center: { lat: 39.174, lng: -76.67 }, gestureHandling: 'greedy'
+                , zoom: 9, styles: mapStyle
+            });
         }
 
         function setData() {
