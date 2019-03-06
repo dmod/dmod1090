@@ -9,6 +9,7 @@
             "request": "launch",
             "name": "Launch via NPM",
             "cwd": "${workspaceFolder}",
+            "env": {"DATABASE_URL": "mongodb://dmod:snowdude695@cluster0-shard-00-00-af2qk.mongodb.net:27017,cluster0-shard-00-01-af2qk.mongodb.net:27017,cluster0-shard-00-02-af2qk.mongodb.net:27017/test?ssl=true&replicaSet=Cluster0-shard-0&authSource=admin&retryWrites=true"},
             "runtimeExecutable": "npm",
             "runtimeArgs": [
                 "run-script",
