@@ -1,14 +1,36 @@
 const express = require('express');
 const path = require('path');
 const request = require('request');
+const mongoose = require('mongoose');
 
 const CURRENT_TRAFFIC_URL = 'http://71.244.212.145:8080/dump1090/data.json';
+const DATABASE_URL = process.env.DATABASE_URL
 
+var flightSchema = new mongoose.Schema({
+    hex: String,
+    squawk: String,
+    flight: String,
+    lat: Number,
+    lon: Number,
+    validposition: Number,
+    altitude: Number,
+    vert_rate: Number,
+    track: Number,
+    validtrack: Number,
+    speed: Number,
+    messages: Number,
+    seen: Number
+});
+
+var Flights = mongoose.model('Flights', flightSchema);
 let all_planes = {};
 
+mongoose.connect(DATABASE_URL, { useNewUrlParser: true });
+var db = mongoose.connection;
+
+db.on('error', console.error.bind(console, 'connection error:'));
+
 let metrics_checker = (error, response, body) => {
-    //console.log('error:', error);
-    //console.log('statusCode:', response && response.statusCode);
     console.log('all_planes size:', Object.keys(all_planes).length);
 
     let current_planes = JSON.parse(body);
@@ -18,7 +40,12 @@ let metrics_checker = (error, response, body) => {
         } else {
             console.log(x.hex + ' is NEW!');
             all_planes[x.hex] = x;
+            var flight = new Flights(x);
+            flight.save(function (err, x) {
+                if (err) return console.error(err);
+            });
         }
+
     });
 }
 
@@ -44,10 +71,7 @@ app.get('/api/v1/test', async (req, res) => {
 })
 
 app.get('/api/v1/current_traffic', async (req, res) => {
-    console.log("someone called current_traffic");
     request(CURRENT_TRAFFIC_URL, function (error, response, body) {
-        console.log('error:', error);
-        console.log('statusCode:', response && response.statusCode);
         let json = JSON.parse(body);
         res.json(json);
     });

@@ -76,6 +76,18 @@
             });
         }
 
+        function getTooltipContent(flight) {
+            var str =
+                "<h1>hex: " + flight.hex + "</h1>" +
+                "<p>flight: " + flight.flight + "</p>" +
+                "<p>altitude: " + flight.altitude + "</p>" +
+                "<p>speed: " + flight.speed + "</p>" +
+                "<p>track: " + flight.track + "</p>" +
+                "<p>messages: " + flight.messages + "</p>" +
+                "<p>seen: " + flight.seen + "</p>";
+            return str;
+        }
+
         function setData() {
             $.getJSON("/api/v1/current_traffic", function (data) {
                 $.each(data, function (key, val) {
@@ -86,7 +98,7 @@
                             var path = traffic_state[val.hex].polyline.getPath();
                             path.push(newLatLng);
                         } else {
-                            var infowindow = new google.maps.InfoWindow({ content: val.hex + " " + val.flight });
+                            var infowindow = new google.maps.InfoWindow({ content: getTooltipContent(val) });
                             var marker = new google.maps.Marker({ position: { lat: val.lat, lng: val.lon }, map: map, title: val.hex });
                             marker.addListener('click', function () {
                                 infowindow.open(map, marker);
