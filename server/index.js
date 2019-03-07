@@ -8,50 +8,36 @@ const DATABASE_URL = process.env.DATABASE_URL
 
 const SENSOR_LOC = { lat: 39.24, lon: -76.73 };
 
-var flightSchema = new mongoose.Schema({
-    hex: String,
-    squawk: String,
+var positionReportSchema = new mongoose.Schema({
     flight: String,
     lat: Number,
     lon: Number,
-    validposition: Number,
     altitude: Number,
     vert_rate: Number,
     track: Number,
     validtrack: Number,
-    speed: Number,
-    messages: Number,
-    seen: Number
+    speed: Number
 });
 
-var Flights = mongoose.model('Flights', flightSchema);
-let all_planes = {};
+var Positions = mongoose.model('Positions', positionReportSchema);
 
 mongoose.connect(DATABASE_URL, { useNewUrlParser: true });
 var db = mongoose.connection;
 
 db.on('error', console.error.bind(console, 'connection error:'));
-db.once('open', () => {
-    // we're connected!
-    console.log('db connected');
-});
+db.once('open', () => { console.log('db connected'); });
 
 let metrics_checker = (error, response, body) => {
-    console.log('all_planes size:', Object.keys(all_planes).length);
-
     let current_planes = JSON.parse(body);
-    current_planes.forEach(x => {
-        if (all_planes[x.hex]) {
-            //console.log('we already know about ' + x.hex);
-        } else {
-            console.log(x.hex + ' is NEW!');
-            all_planes[x.hex] = x;
-            var flight = new Flights(x);
-            flight.save(function (err, x) {
-                if (err) return console.error(err);
-            });
-        }
 
+    // Only parse reports that have a location
+    current_planes = current_planes.filter(x => x.lat && x.lon);
+
+    current_planes.forEach(x => {
+        var position = new Positions(x);
+        position.save(function (err, x) {
+            if (err) return console.error(err);
+        });
     });
 }
 
@@ -59,7 +45,7 @@ function plane_timer() {
     request(CURRENT_TRAFFIC_URL, metrics_checker);
 }
 
-setInterval(plane_timer, 10000);
+setInterval(plane_timer, 5000);
 
 //
 // START EXPRESS
@@ -84,7 +70,7 @@ app.get('/api/v1/current_traffic', async (req, res) => {
 })
 
 app.get('/api/v1/furthest_contact', async (req, res) => {
-    Flights.find({}, function (err, allContacts) {
+    Positions.find({}, function (err, allContacts) {
         if (err) console.log(err);
 
         let longestDistance = 0;
