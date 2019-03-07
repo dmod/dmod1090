@@ -9,6 +9,8 @@ const DATABASE_URL = process.env.DATABASE_URL
 const SENSOR_LOC = { lat: 39.24, lon: -76.73 };
 
 var positionReportSchema = new mongoose.Schema({
+    epoch: Date,
+    hex: String,
     flight: String,
     lat: Number,
     lon: Number,
@@ -35,6 +37,7 @@ let metrics_checker = (error, response, body) => {
 
     current_planes.forEach(x => {
         var position = new Positions(x);
+        position.epoch = new Date();
         position.save(function (err, x) {
             if (err) return console.error(err);
         });
