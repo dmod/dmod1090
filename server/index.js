@@ -21,7 +21,18 @@ var positionReportSchema = new mongoose.Schema({
     speed: Number
 });
 
+var distantReportSchema = new mongoose.Schema({
+    epoch: Date,
+    hex: String,
+    flight: String,
+    lat: Number,
+    lon: Number,
+    altitude: Number,
+    distance: Number
+});
+
 var Positions = mongoose.model('Positions', positionReportSchema);
+var DistantReports = mongoose.model('DistantReports', distantReportSchema);
 
 mongoose.connect(DATABASE_URL, { useNewUrlParser: true });
 var db = mongoose.connection;
@@ -36,19 +47,39 @@ let metrics_checker = (error, response, body) => {
     current_planes = current_planes.filter(x => x.lat && x.lon);
 
     current_planes.forEach(x => {
+        var calculatedEpoch = new Date();
+
+        /*
         var position = new Positions(x);
-        position.epoch = new Date();
+        position.epoch = calculatedEpoch;
         position.save(function (err, x) {
             if (err) return console.error(err);
         });
+        */
+
+        var distantReport = new DistantReports(x);
+        distantReport.epoch = calculatedEpoch;
+        distantReport.distance = calcCrow(SENSOR_LOC.lat, SENSOR_LOC.lon, x.lat, x.lon);
+
+        DistantReports.findOne({ hex: x.hex }, null, null, (err, oldPosition) => {
+            if (oldPosition) {
+                if (oldPosition.distance < distantReport.distance) {
+                    oldPosition.remove();
+                    distantReport.save(function (err, x) {
+                        if (err) return console.error(err);
+                    });
+                }
+
+            } else {
+                distantReport.save(function (err, x) {
+                    if (err) return console.error(err);
+                });
+            }
+        })
     });
 }
 
-function plane_timer() {
-    request(CURRENT_TRAFFIC_URL, metrics_checker);
-}
-
-setInterval(plane_timer, 5000);
+setInterval(() => {request(CURRENT_TRAFFIC_URL, metrics_checker)}, 1000);
 
 //
 // START EXPRESS
@@ -106,7 +137,7 @@ function calcCrow(lat1, lon1, lat2, lon2) {
     var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.sin(dLon / 2) * Math.sin(dLon / 2) * Math.cos(lat1) * Math.cos(lat2);
     var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     var d = R * c;
-    return d;
+    return Math.round(d * 1000) / 1000;
 }
 
 // Converts numeric degrees to radians
