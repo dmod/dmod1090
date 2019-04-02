@@ -31,8 +31,20 @@ var distantReportSchema = new mongoose.Schema({
     distance: Number
 });
 
+var bearingReportSchema = new mongoose.Schema({
+    epoch: Date,
+    hex: String,
+    flight: String,
+    lat: Number,
+    lon: Number,
+    altitude: Number,
+    distance: Number,
+    bearing: Number
+});
+
 var Positions = mongoose.model('Positions', positionReportSchema);
 var DistantReports = mongoose.model('DistantReports', distantReportSchema);
+var BearingReports = mongoose.model('BearingReport', bearingReportSchema);
 
 mongoose.connect(DATABASE_URL, { useNewUrlParser: true });
 var db = mongoose.connection;
@@ -48,18 +60,32 @@ let metrics_checker = (error, response, body) => {
 
     current_planes.forEach(x => {
         var calculatedEpoch = new Date();
-
-        /*
-        var position = new Positions(x);
-        position.epoch = calculatedEpoch;
-        position.save(function (err, x) {
-            if (err) return console.error(err);
-        });
-        */
+        var distance = calcCrow(SENSOR_LOC.lat, SENSOR_LOC.lon, x.lat, x.lon);
 
         var distantReport = new DistantReports(x);
         distantReport.epoch = calculatedEpoch;
-        distantReport.distance = calcCrow(SENSOR_LOC.lat, SENSOR_LOC.lon, x.lat, x.lon);
+        distantReport.distance = distance;
+
+        var bearing = Math.floor(calcBearing(SENSOR_LOC.lat, SENSOR_LOC.lon, x.lat, x.lon));
+        var bearingReport = new BearingReports(x);
+        bearingReport.epoch = calculatedEpoch;
+        bearingReport.distance = distance;
+        bearingReport.bearing = bearing;
+
+        BearingReports.findOne({ bearing: bearing }, (err, oldBearingReport) => {
+            if (oldBearingReport) {
+                if (oldBearingReport.distance < bearingReport.distance) {
+                    oldBearingReport.remove();
+                    bearingReport.save(function (err, x) {
+                        if (err) return console.error(err);
+                    });
+                }
+            } else {
+                bearingReport.save(function (err, x) {
+                    if (err) return console.error(err);
+                });
+            }
+        })
 
         DistantReports.findOne({ hex: x.hex }, null, null, (err, oldPosition) => {
             if (oldPosition) {
@@ -79,7 +105,7 @@ let metrics_checker = (error, response, body) => {
     });
 }
 
-setInterval(() => {request(CURRENT_TRAFFIC_URL, metrics_checker)}, 1000);
+setInterval(() => { request(CURRENT_TRAFFIC_URL, metrics_checker) }, 10000);
 
 //
 // START EXPRESS
@@ -140,7 +166,20 @@ function calcCrow(lat1, lon1, lat2, lon2) {
     return Math.round(d * 1000) / 1000;
 }
 
+function calcBearing(lat1, lng1, lat2, lng2) {
+    var dLon = (lng2 - lng1);
+    var y = Math.sin(dLon) * Math.cos(lat2);
+    var x = Math.cos(lat1) * Math.sin(lat2) - Math.sin(lat1) * Math.cos(lat2) * Math.cos(dLon);
+    var brng = toDeg(Math.atan2(y, x));
+    return 360 - ((brng + 360) % 360);
+}
+
 // Converts numeric degrees to radians
-function toRad(Value) {
-    return Value * Math.PI / 180;
+function toRad(deg) {
+    return deg * Math.PI / 180;
+}
+
+// Converts numeric radians to degrees
+function toDeg(rad) {
+    return rad * 180 / Math.PI;
 }
