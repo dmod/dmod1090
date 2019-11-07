@@ -1,10 +1,11 @@
+const utilities = require('./utilities.js');
+
 const express = require('express');
 const path = require('path');
 const request = require('request');
 
-const CURRENT_TRAFFIC_URL = 'http://71.244.212.145:8080/dump1090/data.json';
-
 const SENSOR_LOC = { lat: 39.24, lon: -76.73 };
+const CURRENT_TRAFFIC_URL = 'http://71.244.212.145:8080/dump1090/data.json';
 
 //
 // START EXPRESS
@@ -23,11 +24,17 @@ app.get('/api/v1/test', async (req, res) => {
 
 app.get('/api/v1/current_traffic', async (req, res) => {
     request(CURRENT_TRAFFIC_URL, function (error, response, body) {
-        let json = JSON.parse(body);
-        res.json(json);
+        let raw_traffic_json = JSON.parse(body);
+        res.json(raw_traffic_json.filter(checkValidPosition));
     });
 })
 
 app.listen(PORT, function () {
     console.info(`PID ${process.pid}: listening on port ${PORT}`);
 });
+
+function checkValidPosition(position_report) {
+    let distance = utilities.calcCrow(SENSOR_LOC.lat, SENSOR_LOC.lon, position_report.lat, position_report.lon);
+    console.log(distance);
+    return distance < 500;
+}

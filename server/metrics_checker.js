@@ -1,4 +1,4 @@
-// ONLY USED FOR MONGO DB INTERFACE
+// ONLY USED FOR TRAFFIC STATISTICS -> MONGO DB
 
 const DATABASE_URL = process.env.DATABASE_URL
 const mongoose = require('mongoose');
