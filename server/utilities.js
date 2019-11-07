@@ -12,7 +12,7 @@ exports.calcCrow = function (lat1, lon1, lat2, lon2) {
     return Math.round(d * 1000) / 1000;
 }
 
-exports.calcBearing =  function (lat1, lng1, lat2, lng2) {
+exports.calcBearing = function (lat1, lng1, lat2, lng2) {
     var dLon = (lng2 - lng1);
     var y = Math.sin(dLon) * Math.cos(lat2);
     var x = Math.cos(lat1) * Math.sin(lat2) - Math.sin(lat1) * Math.cos(lat2) * Math.cos(dLon);
