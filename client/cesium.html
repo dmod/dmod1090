@@ -15,11 +15,15 @@
     Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIxOTljNzc3NS01ZmMyLTQ0MjAtOTU0Zi0zNGVjYWQyMTM2MjkiLCJpZCI6MTgzNjMsInNjb3BlcyI6WyJhc3IiLCJnYyJdLCJpYXQiOjE1NzM2OTk5ODN9.Ipc_nTZjU3c02Mbu2zhHBefq9K9QgUCIX_D1qAQzw28';
     var viewer = new Cesium.Viewer('cesiumContainer');
 
+    function feetToMeters(x) {
+      return x * 0.3048;
+    }
+
     $.get("/api/v1/current_traffic", function (data) {
       data.forEach(x => {
         viewer.entities.add({
           name: x.hex,
-          position: Cesium.Cartesian3.fromDegrees(x.lon, x.lat),
+          position: Cesium.Cartesian3.fromDegrees(x.lon, x.lat, feetToMeters(x.altitude)),
           point: {
             pixelSize: 5,
             color: Cesium.Color.RED,
