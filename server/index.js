@@ -33,5 +33,5 @@ app.listen(PORT, function () {
 
 function checkValidPosition(position_report) {
     const distance = utilities.calcCrow(SENSOR_LOC.lat, SENSOR_LOC.lon, position_report.lat, position_report.lon);
-    return distance < 500; // Reports over 500 miles away aren't typically possible and usually the result of malformed data
+    return distance < 220; // Reports over 220 miles away aren't typically possible and usually the result of malformed data
 };
