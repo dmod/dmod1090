@@ -22,6 +22,11 @@ app.get('/api/v1/test', async (req, res) => {
 
 app.get('/api/v1/current_traffic', async (req, res) => {
     request(CURRENT_TRAFFIC_URL, function (error, response, body) {
+
+        if (error) {
+            return console.error('Error:', error);
+        }
+
         const rawTrafficJSON = JSON.parse(body);
         res.json(rawTrafficJSON.filter(checkValidPosition));
     });
