@@ -10,7 +10,7 @@
 </head>
 
 <body>
-  <div id="cesiumContainer" style="width: 1200px; height:800px"></div>
+  <div id="cesiumContainer" style="width: 1800px; height:1200px"></div>
   <script>
     Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIxOTljNzc3NS01ZmMyLTQ0MjAtOTU0Zi0zNGVjYWQyMTM2MjkiLCJpZCI6MTgzNjMsInNjb3BlcyI6WyJhc3IiLCJnYyJdLCJpYXQiOjE1NzM2OTk5ODN9.Ipc_nTZjU3c02Mbu2zhHBefq9K9QgUCIX_D1qAQzw28';
     var viewer = new Cesium.Viewer('cesiumContainer');
@@ -19,30 +19,62 @@
       return x * 0.3048;
     }
 
-    $.get("/api/v1/current_traffic", function (data) {
-      data.forEach(x => {
-        viewer.entities.add({
-          name: x.hex,
-          position: Cesium.Cartesian3.fromDegrees(x.lon, x.lat, feetToMeters(x.altitude)),
-          point: {
-            pixelSize: 5,
-            color: Cesium.Color.RED,
-            outlineColor: Cesium.Color.WHITE,
-            outlineWidth: 2
-          },
-          label: {
-            text: x.hex,
-            font: '14pt monospace',
-            style: Cesium.LabelStyle.FILL_AND_OUTLINE,
-            outlineWidth: 2,
-            verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
-            pixelOffset: new Cesium.Cartesian2(0, -9)
+    var traffic_state = {};
+
+    function resetCurrentTraffic() {
+      viewer.entities.removeAll();
+      $.get("/api/v1/current_traffic", function (data) {
+        data.forEach(x => {
+
+          if (traffic_state[val.hex]) {
+            var newLatLng = new google.maps.LatLng(val.lat, val.lon);
+            traffic_state[val.hex].marker.setPosition(newLatLng);
+            var path = traffic_state[val.hex].polyline.getPath();
+            path.push(newLatLng);
+          } else {
+            polyline.positions = Cesium.Cartesian3.fromDegreesArray([
+              0.0, 0.0,
+              10.0, 0.0,
+              0.0, 20.0
+            ]);
+            var poly = new google.maps.Polyline({
+              strokeColor: '#FF0000',
+              strokeOpacity: 1.0,
+              strokeWeight: 3
+            });
+            poly.setMap(map);
+
+            traffic_state[val.hex] = { marker: marker, polyline: poly };
           }
-        });
-        console.log(x)
-      }
-      );
-    });
+
+
+
+          viewer.entities.add({
+            name: x.hex,
+            position: Cesium.Cartesian3.fromDegrees(x.lon, x.lat, feetToMeters(x.altitude)),
+            point: {
+              pixelSize: 5,
+              color: Cesium.Color.RED,
+              outlineColor: Cesium.Color.WHITE,
+              outlineWidth: 2
+            },
+            label: {
+              text: x.hex,
+              font: '14pt monospace',
+              style: Cesium.LabelStyle.FILL_AND_OUTLINE,
+              outlineWidth: 2,
+              verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
+              pixelOffset: new Cesium.Cartesian2(0, -9)
+            }
+          });
+          console.log(x)
+        }
+        );
+      });
+    }
+    resetCurrentTraffic();
+    setInterval(resetCurrentTraffic, 1000);
+
     viewer.zoomTo(viewer.entities);
   </script>
 </body>
