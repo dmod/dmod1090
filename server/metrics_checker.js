@@ -1,9 +1,9 @@
 // ONLY USED FOR TRAFFIC STATISTICS -> MONGO DB
 
 const DATABASE_URL = process.env.DATABASE_URL
-const mongoose = require('mongoose');
+import { Schema, model, connect, connection } from 'mongoose';
 
-var positionReportSchema = new mongoose.Schema({
+var positionReportSchema = new Schema({
     epoch: Date,
     hex: String,
     flight: String,
@@ -16,7 +16,7 @@ var positionReportSchema = new mongoose.Schema({
     speed: Number
 });
 
-var distantReportSchema = new mongoose.Schema({
+var distantReportSchema = new Schema({
     epoch: Date,
     hex: String,
     flight: String,
@@ -26,23 +26,11 @@ var distantReportSchema = new mongoose.Schema({
     distance: Number
 });
 
-var bearingReportSchema = new mongoose.Schema({
-    epoch: Date,
-    hex: String,
-    flight: String,
-    lat: Number,
-    lon: Number,
-    altitude: Number,
-    distance: Number,
-    bearing: Number
-});
+var Positions = model('Positions', positionReportSchema);
+var DistantReports = model('DistantReports', distantReportSchema);
 
-var Positions = mongoose.model('Positions', positionReportSchema);
-var DistantReports = mongoose.model('DistantReports', distantReportSchema);
-var BearingReports = mongoose.model('BearingReport', bearingReportSchema);
-
-mongoose.connect(DATABASE_URL, { useNewUrlParser: true });
-var db = mongoose.connection;
+connect(DATABASE_URL, { useNewUrlParser: true });
+var db = connection;
 
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', () => { console.log('db connected'); });

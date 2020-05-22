@@ -58,18 +58,19 @@ def get_distance(lat1, lon1, alt1, lat2, lon2, alt2):
 
 
 def compute():
-    headers = {'user-agent': 'my-app/0.0.1'}
 
     # toplat, bottomlat, leftlon, rightlon
     all_raw_jsons = {}
     for leftlon in range(-180, 180, SLICE_WIDTH):
         rightlon = leftlon + SLICE_WIDTH
         slice_url = BASE_ENDPOINT + f'?bounds=90,-90,{leftlon},{rightlon}'
-        raw_json = requests.get(slice_url, headers=headers).json()
+        raw_json = requests.get(slice_url, headers={'user-agent': 'my-app/0.0.1'}).json()
         print(f"Number for {slice_url} : {len(raw_json)}")
+        
         all_raw_jsons.update(raw_json)
 
     all_planes = parse_raw_result(all_raw_jsons)
+
     number_of_planes = len(all_planes)
     print(f"Found {number_of_planes} planes")
 
@@ -86,13 +87,10 @@ def compute():
                 closest['distance'] = distance_between
                 closest['plane_one'] = plane
                 closest['plane_two'] = other_plane
-            #print(f"The distance between {plane['flight']} and {other_plane['flight']} is {distance_between} miles?")
-            #print(f"Source: {plane['lat']}, {plane['lon']} and {other_plane['lat']}, {other_plane['lon']}")
 
     print(f"Planes x Planes: {number_of_planes * number_of_planes}")
     print(f"Number of comparisons: {comparisons}")
-    print(
-        f"Done. The closest happened to be {closest['distance']} miles apart")
+    print(f"Done. The closest happened to be {closest['distance']} miles apart")
     print(f"Plane One: {str(closest['plane_one'])}")
     print(f"Plane Two: {str(closest['plane_two'])}")
     print(f"https://www.flightradar24.com/{closest['plane_one']['hex']}")
