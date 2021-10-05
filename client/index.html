@@ -22,19 +22,16 @@
                 },
                 stateSave: true,
                 "columns": [
-                    { "data": "hex" },
-                    { "data": "squawk" },
-                    { "data": "flight" },
-                    { "data": "lat" },
-                    { "data": "lon" },
-                    { "data": "validposition" },
-                    { "data": "altitude" },
-                    { "data": "vert_rate" },
-                    { "data": "track" },
-                    { "data": "validtrack" },
-                    { "data": "speed" },
-                    { "data": "messages" },
-                    { "data": "seen" }
+                    { "data": "hex", "defaultContent": "<i>Not set</i>" },
+                    { "data": "flight", "defaultContent": "<i>Not set</i>" },
+                    { "data": "lat", "defaultContent": "<i>Not set</i>" },
+                    { "data": "lon", "defaultContent": "<i>Not set</i>" },
+                    { "data": "altitude", "defaultContent": "<i>Not set</i>" },
+                    { "data": "vert_rate", "defaultContent": "<i>Not set</i>" },
+                    { "data": "track", "defaultContent": "<i>Not set</i>" },
+                    { "data": "speed", "defaultContent": "<i>Not set</i>" },
+                    { "data": "messages", "defaultContent": "<i>Not set</i>" },
+                    { "data": "seen", "defaultContent": "<i>Not set</i>" }
                 ],
                 "paging": false
             });
@@ -64,7 +61,7 @@
     <div style="text-align:center;padding:40px;">
         <h1><span style="padding:20px;"></span>Current Traffic<span style="padding:20px;"></span></h1>
     </div>
-    
+
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCMPIUI93Y-We8QFktG-yvee95U9Q948ko&callback=initMap" async defer></script>
 
     <div id="map"></div>
@@ -93,27 +90,25 @@
         function setData() {
             $.getJSON("/api/v1/current_traffic", function (data) {
                 $.each(data, function (key, val) {
-                    if (val.validposition) {
-                        if (traffic_state[val.hex]) {
-                            var newLatLng = new google.maps.LatLng(val.lat, val.lon);
-                            traffic_state[val.hex].marker.setPosition(newLatLng);
-                            var path = traffic_state[val.hex].polyline.getPath();
-                            path.push(newLatLng);
-                        } else {
-                            var infowindow = new google.maps.InfoWindow({ content: getTooltipContent(val) });
-                            var marker = new google.maps.Marker({ position: { lat: val.lat, lng: val.lon }, map: map, title: val.hex });
-                            marker.addListener('click', function () {
-                                infowindow.open(map, marker);
-                            });
-                            var poly = new google.maps.Polyline({
-                                strokeColor: '#FF0000',
-                                strokeOpacity: 1.0,
-                                strokeWeight: 3
-                            });
-                            poly.setMap(map);
+                    if (traffic_state[val.hex]) {
+                        var newLatLng = new google.maps.LatLng(val.lat, val.lon);
+                        traffic_state[val.hex].marker.setPosition(newLatLng);
+                        var path = traffic_state[val.hex].polyline.getPath();
+                        path.push(newLatLng);
+                    } else {
+                        var infowindow = new google.maps.InfoWindow({ content: getTooltipContent(val) });
+                        var marker = new google.maps.Marker({ position: { lat: val.lat, lng: val.lon }, map: map, title: val.hex });
+                        marker.addListener('click', function () {
+                            infowindow.open(map, marker);
+                        });
+                        var poly = new google.maps.Polyline({
+                            strokeColor: '#FF0000',
+                            strokeOpacity: 1.0,
+                            strokeWeight: 3
+                        });
+                        poly.setMap(map);
 
-                            traffic_state[val.hex] = { marker: marker, polyline: poly };
-                        }
+                        traffic_state[val.hex] = { marker: marker, polyline: poly };
                     }
                 });
             });
@@ -128,15 +123,12 @@
             <thead>
                 <tr>
                     <th>hex</th>
-                    <th>squawk</th>
                     <th>flight</th>
                     <th>lat</th>
                     <th>lon</th>
-                    <th>validposition</th>
                     <th>altitude</th>
                     <th>vert_rate</th>
                     <th>track</th>
-                    <th>validtrack</th>
                     <th>speed</th>
                     <th>messages</th>
                     <th>seen</th>
