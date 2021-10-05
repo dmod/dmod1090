@@ -1,1 +1,11 @@
 Miscellaneous tools and scripts to interface with dump1090
+
+http://127.0.0.1/dump1090/data/aircraft.json
+
+upnpc - miniupnpc library test client
+sudo apt install miniupnpc
+
+upnpc [options] -a ip port external_port protocol [duration]
+upnpc -a 192.168.1.2 80 3333 TCP
+
+Client side query the current_traffic JSON? CORS is an issue... have server side query the current_traffic JSON and return it over the API endpoint.

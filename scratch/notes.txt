@@ -1,1 +1,0 @@
-Client side query the current_traffic JSON? CORS is an issue... have server side query the current_traffic JSON and return it over the API endpoint.

@@ -5,7 +5,7 @@ const path = require('path');
 const request = require('request');
 
 const SENSOR_LOC = { lat: 39.24, lon: -76.73 };
-const CURRENT_TRAFFIC_URL = 'http://71.244.212.145:8080/dump1090/data.json';
+const CURRENT_TRAFFIC_URL = 'http://71.244.212.145:3333/dump1090/data/aircraft.json';
 
 // START EXPRESS
 const PORT = process.env.PORT || 5000;
