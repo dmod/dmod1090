@@ -9,7 +9,10 @@ import datetime
 
 BASE_ENDPOINT = 'https://data-live.flightradar24.com/zones/fcgi/feed.js'
 R = 3958.8  # Earth radius in meters
-SLICE_WIDTH = 30
+REQUEST_SLICE_WIDTH = 5
+OVERLAP_WIDTH = 1
+LONGITUDE_BATCH_WIDTH = 10
+LATITUDE_BATCH_HEIGHT = 10
 
 
 def parse_raw_result(raw_result):
@@ -47,36 +50,51 @@ def get_distance(lat1, lon1, alt1, lat2, lon2, alt2):
     a = math.sin(dphi/2)**2 + math.cos(phi1) * \
         math.cos(phi2)*math.sin(dlambda/2)**2
 
-    horizontal_distance_miles = (
-        2*R*math.atan2(math.sqrt(a), math.sqrt(1 - a)))
+    horizontal_distance_miles = (2*R*math.atan2(math.sqrt(a), math.sqrt(1 - a)))
     vertical_distance_miles = abs(alt1 - alt2) / 5280
 
-    hypotenuse_distance_miles = math.sqrt(
-        pow(horizontal_distance_miles, 2) + pow(vertical_distance_miles, 2))
+    hypotenuse_distance_miles = math.sqrt(pow(horizontal_distance_miles, 2) + pow(vertical_distance_miles, 2))
 
     return hypotenuse_distance_miles
 
+def add_planes_to_collision_check_boxes(all_planes):
+    for toplat in range(90, -90, -LATITUDE_BATCH_HEIGHT):
+        for leftlon in range(-180, 180, LONGITUDE_BATCH_WIDTH): 
+            box_top_left = (toplat, lon)
+            box_top_right = toplat + LONGITUDE_BATCH_WIDTH + OVERLAP_WIDTH
+            box_bottom_left = toplat - LATITUDE_BATCH_HEIGHT - OVERLAP_WIDTH
+            box_bottom_right = box_bottom_left
 
-def compute():
 
+
+def get_all_planes():
     # toplat, bottomlat, leftlon, rightlon
     all_raw_jsons = {}
-    for leftlon in range(-180, 180, SLICE_WIDTH):
-        rightlon = leftlon + SLICE_WIDTH
+    for leftlon in range(-180, 180, REQUEST_SLICE_WIDTH):
+        rightlon = leftlon + REQUEST_SLICE_WIDTH
         slice_url = BASE_ENDPOINT + f'?bounds=90,-90,{leftlon},{rightlon}'
         raw_json = requests.get(slice_url, headers={'user-agent': 'my-app/0.0.1'}).json()
         print(f"Number for {slice_url} : {len(raw_json)}")
-        
+
         all_raw_jsons.update(raw_json)
 
     all_planes = parse_raw_result(all_raw_jsons)
 
-    number_of_planes = len(all_planes)
-    print(f"Found {number_of_planes} planes")
+    print(f"Found {len(all_planes)} planes")
+
+    return all_planes
+
+
+def compute():
+
+    all_planes = get_all_planes()
+
+    collision_check_boxes = add_planes_to_collision_check_boxes(all_planes)
 
     closest = {}
     closest['distance'] = 5000
     comparisons = 0
+
     for plane_index, plane in enumerate(all_planes):
 
         for other_plane_index, other_plane in enumerate(all_planes[plane_index + 1:]):
@@ -88,7 +106,6 @@ def compute():
                 closest['plane_one'] = plane
                 closest['plane_two'] = other_plane
 
-    print(f"Planes x Planes: {number_of_planes * number_of_planes}")
     print(f"Number of comparisons: {comparisons}")
     print(f"Done. The closest happened to be {closest['distance']} miles apart")
     print(f"Plane One: {str(closest['plane_one'])}")
