@@ -5,23 +5,13 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Python: Current File",
-            "type": "python",
+            "type": "pwa-node",
             "request": "launch",
-            "program": "${file}",
-            "console": "integratedTerminal"
-        },
-        {
-            "type": "node",
-            "request": "launch",
-            "name": "Launch via NPM",
-            "cwd": "${workspaceFolder}",
-            "runtimeExecutable": "npm",
-            "runtimeArgs": [
-                "run-script",
-                "debug"
+            "name": "Launch Program",
+            "skipFiles": [
+                "<node_internals>/**"
             ],
-            "port": 9229
+            "program": "${workspaceFolder}\\server"
         }
     ]
 }

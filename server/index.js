@@ -27,7 +27,7 @@ app.get('/api/v1/current_traffic', async (req, res) => {
             return console.error('Error:', error);
         }
 
-        const rawTrafficJSON = JSON.parse(body);
+        const rawTrafficJSON = JSON.parse(body).aircraft;
         res.json(rawTrafficJSON.filter(checkValidPosition));
     });
 });
