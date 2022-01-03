@@ -91,10 +91,13 @@
             $.getJSON("/api/v1/current_traffic", function (data) {
                 $.each(data, function (key, val) {
                     if (traffic_state[val.hex]) {
+                        // Already being tracked, add new marker to path and update tooltip
                         var newLatLng = new google.maps.LatLng(val.lat, val.lon);
                         traffic_state[val.hex].marker.setPosition(newLatLng);
                         var path = traffic_state[val.hex].polyline.getPath();
                         path.push(newLatLng);
+
+                        traffic_state[val.hex].tooltip.setContent(getTooltipContent(val));
                     } else {
                         var infowindow = new google.maps.InfoWindow({ content: getTooltipContent(val) });
                         var marker = new google.maps.Marker({ position: { lat: val.lat, lng: val.lon }, map: map, title: val.hex });
@@ -108,7 +111,7 @@
                         });
                         poly.setMap(map);
 
-                        traffic_state[val.hex] = { marker: marker, polyline: poly };
+                        traffic_state[val.hex] = { marker: marker, polyline: poly, tooltip: infowindow };
                     }
                 });
             });
